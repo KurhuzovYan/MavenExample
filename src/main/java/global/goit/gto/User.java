@@ -14,6 +14,6 @@ public class User {
 
     @Override
     public String toString() {
-        return name + System.lineSeparator() + lastName;
+        return name + " " + lastName;
     }
 }

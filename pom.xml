@@ -12,13 +12,13 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lombok.varsion>1.18.24</lombok.varsion>
+        <slf4j.version>2.0.0-alpha1</slf4j.version>
+        <lombok.version>1.18.24</lombok.version>
         <gson.version>2.10.1</gson.version>
         <maven.jar.plugin.versiun>3.3.0</maven.jar.plugin.versiun>
         <maven.compiler.plugin.version>3.6.1</maven.compiler.plugin.version>
         <mainClass.path>global.goit.Launcher</mainClass.path>
         <compiler.configuration>1.8</compiler.configuration>
-        <docker.plugin.version>0.43.0</docker.plugin.version>
         <maven.assembly.plugin.versin>3.1.1</maven.assembly.plugin.versin>
         <final.name>my-name</final.name>
         <dependency.descriptor>jar-with-dependencies</dependency.descriptor>
@@ -26,9 +26,15 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.varsion}</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -73,7 +79,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>${maven.assembly.plugin.versin}</version>
-
                 <configuration>
                     <archive>
                         <manifest>
@@ -88,7 +93,6 @@
                         <descriptorRef>${dependency.descriptor}</descriptorRef>
                     </descriptorRefs>
                 </configuration>
-
                 <executions>
                     <execution>
                         <id>make-assembly</id>
@@ -100,55 +104,6 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>io.fabric8</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>${docker.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>build</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <pushRegistry>localhost:5000</pushRegistry>
-                    <containerNamePattern>%n</containerNamePattern>
-                    <images>
-                        <image>
-                            <alias>maven-demo</alias>
-                            <name>my1795/docker-demo:${project.version}</name>
-                            <build>
-                                <from>openjdk:17-alpine</from>
-                                <assembly>
-                                    <name>maven-test</name>
-                                    <targetDir>/maven-test</targetDir>
-                                </assembly>
-                                <entryPoint>java -jar /maven-test/${build.finalName}-${dependency.descriptor}.jar</entryPoint>
-                            </build>
-                            <run>
-                                <ports>
-                                    <port>8080:8187</port>
-                                </ports>
-                            </run>
-                            <copy>
-                                <entries>
-                                    <entry>
-                                        <containerPath>/maven-test</containerPath>
-                                        <hostDirectory>
-                                            ${project.build.directory}/target/${build.finalName}-${dependency.descriptor}.jar
-                                        </hostDirectory>
-                                    </entry>
-                                </entries>
-                            </copy>
-                        </image>
-                    </images>
-                </configuration>
-            </plugin>
-
         </plugins>
     </build>
-
 </project>
